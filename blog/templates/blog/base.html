@@ -1,0 +1,117 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
+        integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+
+    <link rel="stylesheet" type="text/css" href="{% static 'blog/main.css' %}">
+
+    {% if title %}
+    <title>GoBlog - {{ title }}</title>
+    {% else %}
+    <title>GoBlog</title>
+    {% endif %}
+</head>
+
+<body>
+    <header class="site-header">
+        <nav class="navbar navbar-expand-md navbar-dark bg-steel fixed-top">
+            <div class="container">
+                <a class="navbar-brand mr-4" href="{% url 'blog-home' %}">GoBlog</a>
+                <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarToggle"
+                    aria-controls="navbarToggle" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarToggle">
+                    <div class="navbar-nav mr-auto">
+                        <a class="nav-item nav-link" href="{% url 'blog-home' %}">Home</a>
+                        <!-- <a class="nav-item nav-link" href="{% url 'blog-about' %}">About</a> -->
+                    </div>
+                    <ul class="navbar-nav mx-auto">
+                        <li style="list-style-type: none;">
+                            <form class="d-flex" style='margin-top:6px; margin-bottom:6px' action="/search"
+                                method="GET">
+                                <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search"
+                                    name="q" value="{{request.GET.q}}" id="q">
+                                <button class="btn btn-dark" type="submit">Search</button>
+                            </form>
+                        </li>
+                    </ul>
+                    <!--Right Side -->
+                    <div class="navbar-nav">
+                        {% if user.is_authenticated %}
+                        <a class="nav-item nav-link" href="{% url 'post-create' %}">New Post</a>
+                        <a class="nav-item nav-link" href="{% url 'profile' %}">Profile</a>
+                        <a class="nav-item nav-link" href="{% url 'logout' %}">Logout</a>
+                        {% else %}
+                        <a class="nav-item nav-link" href="{% url 'login' %}">Login</a>
+                        <a class="nav-item nav-link" href="{% url 'register' %}">Register</a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </nav>
+    </header>
+    <main role="main" class="container">
+        <div class="row">
+            <div class="col-md-8">
+                {% if messages %}
+                {% for message in messages %}
+                <div class="alert alert-{{ message.tags }}">
+                    {{ message }}
+                </div>
+                {% endfor %}
+                {% endif %}
+                {% block content %}{% endblock %}
+            </div>
+            {% block sidebar %}
+            <div class="col-lg-4 sidebar">
+                <ul class="list-group category">
+                    <li class="list-group-item active" aria-current="true">Category</li>
+                    {% for categories in cat_list %}
+                    <a href="{% url 'category' categories %}" style="text-decoration:none; color:black">
+                        <li class="list-group-item">{{categories}} <span
+                                class="badge bg-dark">{{categories.category_set.count}}</span></li>
+                    </a>
+                    {% endfor %}
+                </ul>
+                <div class="recent-post card">
+                    <h2>Recent Posts</h2>
+                    {% for post in latestpost_list %}
+                    <div class="img-p">
+                        <a style="text-decoration:none; color:black" href="{% url 'post-detail' post.id %}">
+                            <p>{{post.title}}</p>
+                        </a>
+                    </div>
+                    {% endfor %}
+                </div>
+                <div class="category-tag card">
+                    <h2>Category Tags</h2>
+                    <div class="button-cuz">
+                        {% for categories in cat_list %}
+                        <a href="{% url 'category' categories %}"><button type="button"
+                                class="btn btn-outline-dark">{{categories}}</button></a>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+            {% endblock %}
+
+        </div>
+    </main>
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"
+        integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN"
+        crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"
+        integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
+        crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"
+        integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
+        crossorigin="anonymous"></script>
+</body>
+
+</html>

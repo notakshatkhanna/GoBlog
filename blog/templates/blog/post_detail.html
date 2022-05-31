@@ -1,0 +1,49 @@
+{% extends "blog/base.html" %}
+{% block content %}
+<article class="media content-section">
+    <img class="rounded-circle article-img" src="{{ object.author.profile.image.url }}">
+
+    <div class="media-body">
+        <img src="{{post.img.url}}" class="card-img-top" alt="...">
+        <div class="article-metadata">
+            <a class="mr-2" href="{% url 'user-posts' object.author.username %}">{{ object.author }}</a>
+            <small class="text-muted">{{ object.date_posted|date:"F d, Y" }}</small>
+            {% if object.author == user %}
+            <div>
+                <a class="btn btn-secondary btn-sm mt-1 mb-1" href="{% url 'post-update' object.id %}">Update</a>
+                <a class="btn btn-danger btn-sm mt-1 mb-1" href="{% url 'post-delete' object.id %}">Delete</a>
+            </div>
+            {% endif %}
+        </div>
+        <h2 class="article-title">{{ object.title }}</h2>
+        <p class="article-content">{{ object.content}}</p>
+    </div>
+</article>
+
+
+{% if not request.user.is_authenticated %}
+<div class="alert alert-danger">To comment, first <a href="/login">log in</a> to your account</div>
+{% endif %}
+
+{% if request.user.is_authenticated %}
+<div class="card">
+    <form action="{% url 'send_comment' post.slug %}" method="POST">
+        {% csrf_token %}
+        <input type="hidden" name="post_id" value="{{ post.id }}">
+        <textarea name="message" cols="120" rows="4"></textarea>
+        <button type="submit" class="btn btn-lg btn-dark">Add Comment</button>
+    </form>
+</div>
+{% endif %}
+
+<div class="card">
+    {% for comment in post.comments.all %}
+    <div class="alert alert-success">
+        <h4>Commented by <strong>{{ comment.sender.first_name}}</strong></h4>
+        <p>Comment: <strong>{{ comment.message }}</strong></p>
+    </div>
+    {% empty %}
+    <div class="alert alert-danger">There is no comment</div>
+    {% endfor %}
+</div>
+{% endblock content %}
